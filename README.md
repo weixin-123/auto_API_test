@@ -94,7 +94,6 @@
 [![B21GUx.png](https://s1.ax1x.com/2020/11/05/B21GUx.png)](https://imgchr.com/i/B21GUx)
 #### 用例说明文档
 ![case_data.xlsx用例说明文档](./image/用例说明文档.png)
-[点击前往用例说明文档Markdown版](apiAutoTest用例说明.md)
 
 #### 使用说明
 
