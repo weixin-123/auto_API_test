@@ -7,13 +7,14 @@
 @ide: PyCharm
 @time: 2020/11/18
 """
-from tools import *
+from tools import logger, extractor, convert_json, rep_expr, allure_step
+from tools.read_file import ReadFile
 
 
 class DataProcess:
     response_dict = {}
-    header = {}
-    null_header = {}
+    header = ReadFile.read_config('$.request_headers')
+    have_token = header.copy()
 
     @classmethod
     def save_response(cls, key: str, value: object) -> None:
@@ -36,13 +37,13 @@ class DataProcess:
         return rep_expr(path_str, cls.response_dict)
 
     @classmethod
-    def handle_header(cls, is_token: str, response: dict, reg) -> dict:
-        """处理header"""
-        if is_token == '写':
-            cls.header['Authorization'] = extractor(response, reg)
-            return cls.header
-        elif is_token == '':
-            return cls.null_header
+    def handle_header(cls, token: str) -> dict:
+        """处理header
+        :param token: 写： 写入token到header中， 读： 使用带token的header， 空：使用不带token的header
+        return
+        """
+        if token == '读':
+            return cls.have_token
         else:
             return cls.header
 
@@ -52,9 +53,8 @@ class DataProcess:
         :param file_obj: 上传文件使用，格式：接口中文件参数的名称:"文件路径地址"/["文件地址1", "文件地址2"]
         实例- 单个文件: &file&D:
         """
-        # todo 待完成
         if file_obj == '':
-            return None
+            return
         for k, v in convert_json(file_obj).items():
             # 多文件上传
             if isinstance(v, list):
@@ -76,11 +76,21 @@ class DataProcess:
             return
         data = rep_expr(variable, cls.response_dict)
         variable = convert_json(data)
-        logger.info(f'最终的请求数据如下: {variable}')
         return variable
 
+    @classmethod
+    def assert_result(cls, response: dict, expect_str: str):
+        """ 预期结果实际结果断言方法
+        :param response: 实际响应字典
+        :param expect_str: 预期响应内容，从excel中读取
+        return None
+        """
+        expect_dict = convert_json(expect_str)
+        index = 0
+        for k, v in expect_dict.items():
+            actual = extractor(response, k)
+            index += 1
+            logger.info(f'第{index}个断言,实际结果:{actual} | 预期结果:{v} \n断言结果 {actual == v}')
+            allure_step(f'第{index}个断言',  f'实际结果:{actual} = 预期结果:{v}')
+            assert actual == v
 
-
-
-if __name__ == '__main__':
-    print(convert_json("""{"files":["D:\\apiAutoTest\\data\\case_data - 副本.xls", "D:\\apiAutoTest\\data\\case_data.xlsx"]}"""))
