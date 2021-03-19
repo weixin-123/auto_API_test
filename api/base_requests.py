@@ -20,6 +20,7 @@ class BaseRequest(object):
     @classmethod
     def get_session(cls):
         if cls.session is None:
+            # 确保，整个接口测试中，使用同一个requests.Session() 来管理cookie
             cls.session = requests.Session()
         return cls.session
 
