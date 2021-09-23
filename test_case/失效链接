@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+
+import requests
+from log_color import LogingColor
+# import ssl
+# ssl._create_default_https_context = ssl._create_unverified_context
+
+logging = LogingColor()
+def download():
+        # 读取txt文件
+        with open('/Users/weixin/PycharmProjects/shixiao/txt/视频链接.txt', 'r') as file:
+            urls = []
+            for line in file.readlines():
+                curLine = line.strip('\n')
+                urls.append(curLine)
+            # # 计算链接地址条数
+            # n_urls = len(urls)
+            # 遍历链接地址下载图片
+            for i, url in enumerate(urls):
+                url = url
+                headers = {
+                    'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.2) Gecko/2008070208 Firefox/3.0.1"
+                }
+                try:
+                    resp = requests.get(url, headers=headers)
+                    # print(resp.status_code)
+                    # print(resp.reason)
+                    if resp.status_code == 200:
+                        pass
+                    if resp.status_code == 404:
+                        print("无效链接:", url)
+                        # s
+                        f = open('/Users/weixin/PycharmProjects/shixiao/txt/异常链接.txt', 'a')
+                        f.writelines(url)
+                        f.writelines('\r\n')
+                        f.close()
+                except:
+                    print("格式不对的链接:", url)
+                    f = open('/Users/weixin/PycharmProjects/shixiao/txt/异常链接.txt', 'a')
+                    f.writelines(url)
+                    f.writelines('\r\n')
+                    f.close()
+
+            f = open('/Users/weixin/PycharmProjects/shixiao/txt/异常链接.txt', 'a')
+            f.writelines("\n-------------------失效链接测试测试完毕---------------------\n")
+
+
+if __name__ == '__main__':
+    download()
